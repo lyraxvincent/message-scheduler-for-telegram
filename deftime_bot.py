@@ -8,8 +8,9 @@ import schedule
 TOKEN = open("authkey", 'r').readline() #str(os.environ['TOKEN_KEY'])
 
 bot = telegram.Bot(token=TOKEN)
-#updates = bot.get_updates()
-#print(updates[0]['message']['forward_from']['id']); exit()
+updates = bot.get_updates(); print("\n\n", updates, "\n\n")
+#print(updates[1]['message']['forward_from']['id'])
+exit()
 
 updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
@@ -53,23 +54,23 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 
-
-def schedule_message(update, context):
+# A handler that listens for regular messages
+def reply(update, context):
     # Grab required text elements
     msg = get_message(update.message.text)
     tm = get_send_time(update.message.text)
 
     # update of the person to send message to
     # we forward any message from this user to the bot first so that we can get user info for the bot
+    #print(bot.get_updates())
     usr = bot.get_updates()[0]['message']['forward_from']['id']
-    #usr = 404768059
-    #context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+    # usr = 404768059
+    # context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
     context.bot.send_message(chat_id=usr, text=msg)
-    #bot.sendMessage(chat_id=usr, text=msg)
+    # bot.sendMessage(chat_id=usr, text=msg)
 
-# A function called every time the Bot receives a Telegram message that contains the /schedule_message command
-scheduleMessage_handler = CommandHandler('schedule_message', schedule_message)
-dispatcher.add_handler(scheduleMessage_handler)
+reply_handler = MessageHandler(Filters.text & (~Filters.command), reply)
+dispatcher.add_handler(reply_handler)
 
 
 # For commands that the bot doesn't understand:
